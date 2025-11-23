@@ -3,6 +3,8 @@ const request = require('supertest');
 const API_URL = 'http://lojaebac.ebaconline.art.br';
 
 describe('API de Cupons - EBAC Shop', () => {
+    
+    jest.setTimeout(30000);
 
     const authHeader = 'Basic YWRtaW5fZWJhYzpAYWRtaW4hJmJAYyEyMDIy';
 
@@ -36,11 +38,13 @@ describe('API de Cupons - EBAC Shop', () => {
     test('Não deve cadastrar cupom com nome duplicado (Caminho Negativo)', async () => {
         const cupomDuplicado = 'CUPOM_DUPLICADO_TESTE_FIXO';
 
+        // Primeira tentativa (garante que existe)
         await request(API_URL)
             .post('/wp-json/wc/v3/coupons')
             .set('Authorization', authHeader)
             .send({ code: cupomDuplicado, amount: '10', discount_type: 'fixed_cart' });
 
+        // Segunda tentativa (deve falhar)
         const response = await request(API_URL)
             .post('/wp-json/wc/v3/coupons')
             .set('Authorization', authHeader)
