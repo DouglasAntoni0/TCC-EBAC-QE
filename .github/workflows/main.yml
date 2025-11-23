@@ -1,0 +1,44 @@
+name: CI - EBAC Shop
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # Job 1: Rodar Testes de API e UI (Cypress + Jest)
+  testes-funcionais:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v3
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Rodar Testes de API (Jest)
+        run: npm run test:api
+
+      - name: Rodar Testes de UI (Cypress)
+        uses: cypress-io/github-action@v6
+        with:
+          # Roda apenas os testes headless (sem abrir navegador)
+          command: npx cypress run
+          
+  # Job 2: Rodar Testes de Performance (K6)
+  teste-performance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v3
+
+      - name: Rodar K6
+        uses: grafana/k6-action@v0.3.0
+        with:
+          filename: Performance/teste_carga.js
