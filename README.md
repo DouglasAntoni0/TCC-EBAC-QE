@@ -23,7 +23,7 @@ Requisitos: Node.js 22, npm e acesso a `http://lojaebac.ebaconline.art.br/`. Os 
 ```bash
 git clone https://github.com/DouglasAntoni0/TCC-EBAC-QE.git
 cd TCC-EBAC-QE
-npm install
+npm ci
 ```
 
 Web:
@@ -40,7 +40,9 @@ API:
 npm run test:api
 ```
 
-O spec de API usa as credenciais de demonstração configuradas no arquivo. Ele cria cupons e não implementa limpeza completa da massa; execute contra o ambiente de treinamento previsto.
+O spec de API usa as credenciais de demonstração configuradas no arquivo. Cada execução cria códigos únicos e exclui os cupons que gerou no `afterAll`, verificando a resposta da exclusão. Execute contra o ambiente de treinamento previsto. `EBAC_BASE_URL` permite informar outra instalação compatível com a mesma autenticação.
+
+Os testes Web de login criam uma conta fictícia própria por execução, usando `example.com`, e limpam a sessão antes de cada cenário. Não dependem de uma conta de aluno previamente cadastrada. Os Page Objects percorrem a paginação para localizar o produto; o caso de estoque usa o limite real da variação e valida a rejeição de uma quantidade acima dele.
 
 ## Executar performance
 
@@ -60,7 +62,9 @@ Para concluí-lo, é necessário fornecer o APK, definir as dependências do mó
 
 ## GitHub Actions e resultados
 
-O workflow `main.yml` executa em push/pull request para `main` e `master`. Um job roda API e Cypress; outro roda k6. Os resultados ficam na [aba Actions](https://github.com/DouglasAntoni0/TCC-EBAC-QE/actions). Consulte a conclusão e os logs da execução correspondente; o README descreve o escopo versionado, sem afirmar aprovação atual de todas as camadas.
+O workflow `main.yml` executa em push/pull request para `main` e `master`, além de acionamento manual. API e Web têm jobs independentes com Node.js 22 e `npm ci`. O k6 roda depois da aprovação funcional, evitando executar carga em paralelo com esses cenários na mesma loja. Execuções da mesma branch são enfileiradas. Capturas/vídeos de falhas do Cypress e o resumo JSON do k6 são guardados como artefatos quando gerados.
+
+O perfil de vinte VUs e o threshold de p95 abaixo de 500 ms são preservados. Uma falha desse limite continua reprovando o CI e exige investigar a aplicação/ambiente. Os resultados ficam na [aba Actions](https://github.com/DouglasAntoni0/TCC-EBAC-QE/actions); consulte a execução correspondente para verificar a aprovação de cada camada.
 
 ## Estrutura
 

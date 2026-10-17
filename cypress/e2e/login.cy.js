@@ -2,27 +2,23 @@
 import LoginPage from '../support/page_objects/login.page'
 
 describe('Funcionalidade: Login na Plataforma', () => {
+  let conta
+  before(() => cy.criarContaTeste().then(dados => { conta = dados }))
+  beforeEach(() => cy.clearCookies())
 
-    /* CT001 - Login com sucesso 
-       Estamos usando um dos usuários de teste fornecidos no PDF do TCC (user1_ebac)
-    */
-    it('CT001 - Deve fazer login com sucesso (Caminho Feliz)', () => {
-        LoginPage.visitar()
-        LoginPage.preencherLogin('user1_ebac', 'psw!ebac@test')
-        LoginPage.submeter()
+  it('CT001 - Deve fazer login com sucesso (Caminho Feliz)', () => {
+    LoginPage.visitar()
+    LoginPage.preencherLogin(conta.usuario, conta.senha)
+    LoginPage.submeter()
+    cy.get('.woocommerce-MyAccount-content').should('contain', conta.usuario.split('@')[0])
+    cy.get('.woocommerce-MyAccount-navigation').contains('a', 'Sair').should('be.visible')
+  })
 
-        // Validação: Verifica se apareceu a mensagem de 'Olá' no painel
-        cy.get('.woocommerce-MyAccount-content > :nth-child(2)').should('contain', 'Olá, user1_ebac')
-    })
-
-    /* CT002 - Login com senha inválida
-    */
-    it('CT002 - Deve exibir mensagem de erro ao inserir senha inválida (Caminho Negativo)', () => {
-        LoginPage.visitar()
-        LoginPage.preencherLogin('user1_ebac', 'senhaerrada')
-        LoginPage.submeter()
-
-        // Validação: Verifica a mensagem de erro
-        cy.get('.woocommerce-error > li')
-    })
+  it('CT002 - Deve exibir mensagem de erro ao inserir senha inválida (Caminho Negativo)', () => {
+    LoginPage.visitar()
+    LoginPage.preencherLogin(conta.usuario, 'SenhaIncorreta@2026!')
+    LoginPage.submeter()
+    cy.get('.woocommerce-error > li').should('be.visible').and('not.be.empty')
+    cy.get('#username').should('be.visible')
+  })
 })

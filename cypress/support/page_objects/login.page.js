@@ -2,19 +2,19 @@ class LoginPage {
 
     visitar() {
         // Acessa a página de Minha Conta
-        cy.visit('http://lojaebac.ebaconline.art.br/minha-conta/')
+        cy.visit('/minha-conta/')
     }
 
     preencherLogin(usuario, senha) {
         // Busca o campo de usuário e digita
         cy.get('#username').type(usuario)
         // Busca o campo de senha e digita
-        cy.get('#password').type(senha)
+        cy.get('#password').type(senha, { log: false })
     }
 
     submeter() {
         // Clica no botão de login
-        cy.get('.woocommerce-form > .button').click()
+        cy.get('form.login [name="login"]').click()
     }
 
 }
