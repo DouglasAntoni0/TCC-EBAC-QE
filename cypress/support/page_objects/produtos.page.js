@@ -26,9 +26,18 @@ class ProdutosPage {
   }
 
   selecionarVariacao(tamanho, cor) {
-    cy.get('.button-variable-item-' + tamanho).click()
+    cy.get('form.variations_form').should('have.class', 'wvs-loaded')
+    cy.get('select[name="attribute_size"]').then($select => {
+      if ($select.val() !== tamanho) {
+        cy.get('.button-variable-item-' + tamanho).click({ scrollBehavior: 'center' })
+      }
+    })
     cy.get('select[name="attribute_size"]').should('have.value', tamanho)
-    cy.get('.button-variable-item-' + cor).click()
+    cy.get('select[name="attribute_color"]').then($select => {
+      if ($select.val() !== cor) {
+        cy.get('.button-variable-item-' + cor).click({ scrollBehavior: 'center' })
+      }
+    })
     cy.get('select[name="attribute_color"]').should('have.value', cor)
     cy.get('.single_add_to_cart_button').should('not.have.class', 'disabled')
     cy.get('input[name="variation_id"]').should($input => {
