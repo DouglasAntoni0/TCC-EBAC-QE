@@ -1,48 +1,74 @@
-# 🏆 TCC - Engenheiro de Qualidade de Software (EBAC)
+# TCC EBAC — testes da EBAC Shop
 
-![Cypress](https://img.shields.io/badge/-cypress-%23E5E5E5?style=for-the-badge&logo=cypress&logoColor=058a5e)
-![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
-![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)
-![K6](https://img.shields.io/badge/k6-%237D64FF.svg?style=for-the-badge&logo=k6&logoColor=white)
-![Appium](https://img.shields.io/badge/Appium-41c8f5?style=for-the-badge&logo=appium&logoColor=white)
-![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
+[![CI](https://github.com/DouglasAntoni0/TCC-EBAC-QE/actions/workflows/main.yml/badge.svg)](https://github.com/DouglasAntoni0/TCC-EBAC-QE/actions/workflows/main.yml)
 
-Este repositório contém o **Projeto Final de Conclusão de Curso (TCC)** da especialização em Engenharia de Qualidade de Software da EBAC (Escola Britânica de Artes Criativas e Tecnologia).
+Projeto de conclusão da formação em Engenharia de Qualidade de Software da EBAC. Reúne automações Web e API, um perfil de carga k6 e uma estrutura inicial de testes Android.
 
-O projeto consiste em uma estratégia completa de garantia de qualidade (QA) aplicada ao e-commerce **EBAC Shop**, abrangendo testes de UI (Web), API, Mobile, Performance e integração em pipeline de CI/CD.
+## Escopo implementado
 
----
+| Camada | Arquivos | Estado atual |
+| --- | --- | --- |
+| Web | `cypress/e2e/login.cy.js` | Login válido e senha inválida |
+| Web | `cypress/e2e/produtos.cy.js` | Adição de produto e limite de estoque |
+| API | `API/cupons.test.js` | Listagem, criação e duplicidade de cupons com Jest/Supertest |
+| Performance | `Performance/teste_carga.js` | Home e busca; rampa até vinte VUs, manutenção e descida; p95 abaixo de 500 ms |
+| Android | `Mobile/` | Specs e Page Objects de catálogo; setup ainda incompleto |
 
-## 🧠 Estratégia de Testes
+Não há cenário Web de checkout neste snapshot. Os cenários usam descrições de comportamento, sem integração com um runner Gherkin/Cucumber.
 
-O projeto foi desenhado simulando um ambiente real de desenvolvimento ágil, utilizando **BDD (Behavior Driven Development)** e padrões de projeto modernos.
+## Executar Web e API
 
-| Nível de Teste | Ferramenta | Cobertura / Escopo |
-| :--- | :--- | :--- |
-| **Web (E2E/UI)** | **Cypress** | Fluxos críticos: Login, Adição ao Carrinho e Checkout. |
-| **API (Integração)** | **Jest + Supertest** | Validação de contratos e regras de negócio do serviço de Cupons. |
-| **Mobile** | **WebdriverIO** | Testes funcionais no aplicativo Android (Catálogo de Produtos). |
-| **Performance** | **K6** | Teste de carga para validar estabilidade sob alto tráfego. |
-| **CI/CD** | **GitHub Actions** | Orquestração automática dos testes a cada Push na branch principal. |
-
----
-
-## 📂 Estrutura do Projeto
-
-A arquitetura do projeto foi organizada para separar responsabilidades e facilitar a manutenção:
+Requisitos: Node.js 22, npm e acesso a `http://lojaebac.ebaconline.art.br/`. Os testes dependem da versão, dos dados e da autenticação do ambiente de treinamento.
 
 ```bash
-TCC-EBAC-QE/
-├── .github/workflows/   # Pipelines de CI/CD (GitHub Actions)
-├── API/                 # Testes de API (Jest/Supertest)
-│   └── cupons.test.js
-├── Mobile/              # Testes Mobile (WebdriverIO)
-│   ├── test/pageobjects # Page Objects do App
-│   └── test/specs       # Scripts de teste do App
-├── Performance/         # Scripts de Performance (K6)
-│   └── teste_carga.js
-├── cypress/             # Testes Web (Cypress)
-│   ├── e2e/             # Scripts de teste E2E
-│   ├── fixtures/        # Massas de dados
-│   └── support/         # Page Objects e Comandos customizados
-└── package.json         # Gerenciamento de dependências e scripts
+git clone https://github.com/DouglasAntoni0/TCC-EBAC-QE.git
+cd TCC-EBAC-QE
+npm install
+```
+
+Web:
+
+```bash
+npm test
+# ou, para depuração
+npx cypress open
+```
+
+API:
+
+```bash
+npm run test:api
+```
+
+O spec de API usa as credenciais de demonstração configuradas no arquivo. Ele cria cupons e não implementa limpeza completa da massa; execute contra o ambiente de treinamento previsto.
+
+## Executar performance
+
+Instale o k6 e, na raiz do repositório, execute:
+
+```bash
+k6 run Performance/teste_carga.js
+```
+
+O perfil tem 20 segundos de subida, 1 minuto e 40 segundos com vinte VUs e 10 segundos de descida. Os checks verificam disponibilidade e conteúdo; o threshold configurado avalia p95 de duração HTTP. A aprovação é específica desse perfil e ambiente.
+
+## Android: preparação pendente
+
+`Mobile/wdio.conf.js` ainda usa `path/to/app.apk`. O repositório não fornece esse APK, e o package.json da raiz não instala WDIO, Appium ou UiAutomator2. Portanto, o módulo não possui um comando de execução reproduzível com a instalação principal.
+
+Para concluí-lo, é necessário fornecer o APK, definir as dependências do módulo, corrigir o caminho do app e as capabilities para o dispositivo/emulador e configurar o servidor Appium. Esses itens permanecem pendentes; mobile não é executado no CI atual.
+
+## GitHub Actions e resultados
+
+O workflow `main.yml` executa em push/pull request para `main` e `master`. Um job roda API e Cypress; outro roda k6. Os resultados ficam na [aba Actions](https://github.com/DouglasAntoni0/TCC-EBAC-QE/actions). Consulte a conclusão e os logs da execução correspondente; o README descreve o escopo versionado, sem afirmar aprovação atual de todas as camadas.
+
+## Estrutura
+
+```text
+API/                       # Jest e Supertest
+Mobile/                    # Estrutura Android pendente de setup
+Performance/               # Perfil k6
+cypress/                   # Specs Web, fixtures e Page Objects
+.github/workflows/main.yml # Web/API e performance
+package.json               # Dependências e comandos Web/API
+```
