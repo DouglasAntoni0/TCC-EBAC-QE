@@ -1,6 +1,10 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
+// Negocia a mesma compressão de resposta usada por clientes HTTP comuns.
+// k6 descompacta o corpo antes das verificações de conteúdo.
+const requestParams = { headers: { 'Accept-Encoding': 'gzip' } };
+
 // Configurações do teste (Conforme TCC)
 export const options = {
   stages: [
@@ -24,7 +28,7 @@ const usuarios = [
 
 export default function () {
   // Caso de Teste 1: Acessar a Página Inicial (Caminho Feliz)
-  const resHome = http.get('http://lojaebac.ebaconline.art.br/');
+  const resHome = http.get('http://lojaebac.ebaconline.art.br/', requestParams);
   
   check(resHome, {
     'Home: status é 200': (r) => r.status === 200,
@@ -33,7 +37,7 @@ export default function () {
 
   // Caso de Teste 2: Buscar um Produto (Simulando carga no banco)
   // Vamos buscar por "Hebrew" que sabemos que existe
-  const resBusca = http.get('http://lojaebac.ebaconline.art.br/?s=Hebrew&post_type=product');
+  const resBusca = http.get('http://lojaebac.ebaconline.art.br/?s=Hebrew&post_type=product', requestParams);
 
   check(resBusca, {
     'Busca: status é 200': (r) => r.status === 200,

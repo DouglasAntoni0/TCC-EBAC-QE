@@ -1,0 +1,28 @@
+name: Carga k6 - ambiente externo
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: carga-ebac
+  cancel-in-progress: false
+
+jobs:
+  teste-performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: grafana/setup-k6-action@v1
+      - name: Rodar K6
+        run: |
+          mkdir -p reports
+          k6 run --summary-export=reports/k6-summary.json Performance/teste_carga.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: resultado-k6
+          path: reports/

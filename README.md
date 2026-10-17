@@ -52,7 +52,7 @@ Instale o k6 e, na raiz do repositório, execute:
 k6 run Performance/teste_carga.js
 ```
 
-O perfil tem 20 segundos de subida, 1 minuto e 40 segundos com vinte VUs e 10 segundos de descida. Os checks verificam disponibilidade e conteúdo; o threshold configurado avalia p95 de duração HTTP. A aprovação é específica desse perfil e ambiente.
+O perfil tem 20 segundos de subida, 1 minuto e 40 segundos com vinte VUs e 10 segundos de descida. Os requests negociam `Accept-Encoding: gzip`; o k6 descompacta a resposta para executar os checks de conteúdo. Os checks verificam disponibilidade e conteúdo; o threshold configurado avalia p95 de duração HTTP. A aprovação é específica desse perfil e ambiente.
 
 ## Android: preparação pendente
 
@@ -62,9 +62,11 @@ Para concluí-lo, é necessário fornecer o APK, definir as dependências do mó
 
 ## GitHub Actions e resultados
 
-O workflow `main.yml` executa em push/pull request para `main` e `master`, além de acionamento manual. API e Web têm jobs independentes com Node.js 22 e `npm ci`. O k6 roda depois da aprovação funcional, evitando executar carga em paralelo com esses cenários na mesma loja. Execuções da mesma branch são enfileiradas. Capturas/vídeos de falhas do Cypress e o resumo JSON do k6 são guardados como artefatos quando gerados.
+O workflow `main.yml` executa em push/pull request para `main` e `master`, além de acionamento manual. API e Web têm jobs independentes com Node.js 22 e `npm ci`; sua aprovação indica que os testes funcionais passaram. Execuções da mesma branch são enfileiradas. Capturas/vídeos de falhas do Cypress são guardados como artefatos quando gerados.
 
-O perfil de vinte VUs e o threshold de p95 abaixo de 500 ms são preservados. Uma falha desse limite continua reprovando o CI e exige investigar a aplicação/ambiente. Os resultados ficam na [aba Actions](https://github.com/DouglasAntoni0/TCC-EBAC-QE/actions); consulte a execução correspondente para verificar a aprovação de cada camada.
+O perfil de carga é executado separadamente em **Actions → Carga k6 - ambiente externo → Run workflow**, pelo arquivo `carga.yml`. Execute-o em uma janela sem testes funcionais contra a mesma loja pública. O resumo JSON fica no artefato `resultado-k6`.
+
+O perfil de vinte VUs e o threshold de p95 abaixo de 500 ms são preservados. Uma falha desse limite reprova o workflow de carga e exige investigar a aplicação/ambiente. O verde no CI funcional não indica aprovação de desempenho. Os resultados ficam na [aba Actions](https://github.com/DouglasAntoni0/TCC-EBAC-QE/actions); consulte a execução correspondente a cada camada.
 
 ## Estrutura
 
@@ -73,6 +75,7 @@ API/                       # Jest e Supertest
 Mobile/                    # Estrutura Android pendente de setup
 Performance/               # Perfil k6
 cypress/                   # Specs Web, fixtures e Page Objects
-.github/workflows/main.yml # Web/API e performance
+.github/workflows/main.yml # Web/API
+.github/workflows/carga.yml # Carga manual contra o ambiente externo
 package.json               # Dependências e comandos Web/API
 ```
