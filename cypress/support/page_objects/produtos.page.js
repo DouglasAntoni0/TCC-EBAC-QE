@@ -5,7 +5,9 @@ class ProdutosPage {
 
   buscarProduto(nomeProduto) {
     cy.get('input[name="s"]').filter(':visible').should('have.length', 1)
-      .clear().type(`${nomeProduto}{enter}`)
+      .clear().type(nomeProduto)
+      .closest('form').find('button[type="submit"]')
+      .should('have.length', 1).click()
   }
 
   buscarProdutoLista(nomeProduto) {
