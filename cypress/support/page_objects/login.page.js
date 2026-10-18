@@ -14,7 +14,7 @@ class LoginPage {
 
     submeter() {
         // Clica no botão de login
-        cy.get('form.login [name="login"]').click()
+        cy.get('[name="login"][type="submit"]').click()
     }
 
 }

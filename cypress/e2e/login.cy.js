@@ -10,15 +10,15 @@ describe('Funcionalidade: Login na Plataforma', () => {
     LoginPage.visitar()
     LoginPage.preencherLogin(conta.usuario, conta.senha)
     LoginPage.submeter()
-    cy.get('.woocommerce-MyAccount-content').should('contain', conta.usuario.split('@')[0])
-    cy.get('.woocommerce-MyAccount-navigation').contains('a', 'Sair').should('be.visible')
+    cy.contains('Olá, ' + conta.usuario.split('@')[0]).should('be.visible')
+    cy.contains('nav a', /^Sair$/).should('be.visible')
   })
 
   it('CT002 - Deve exibir mensagem de erro ao inserir senha inválida (Caminho Negativo)', () => {
     LoginPage.visitar()
     LoginPage.preencherLogin(conta.usuario, 'SenhaIncorreta@2026!')
     LoginPage.submeter()
-    cy.get('.woocommerce-error > li').should('be.visible').and('not.be.empty')
+    cy.get('[role="alert"]').should('be.visible').and('not.be.empty')
     cy.get('#username').should('be.visible')
   })
 })

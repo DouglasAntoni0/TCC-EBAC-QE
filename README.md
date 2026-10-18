@@ -42,7 +42,7 @@ npm run test:api
 
 O spec de API usa as credenciais de demonstração configuradas no arquivo. Cada execução cria códigos únicos e exclui os cupons que gerou no `afterAll`, verificando a resposta da exclusão. Execute contra o ambiente de treinamento previsto. `EBAC_BASE_URL` permite informar outra instalação compatível com a mesma autenticação.
 
-Os testes Web de login criam uma conta fictícia própria por execução, usando `example.com`, e limpam a sessão antes de cada cenário. Não dependem de uma conta de aluno previamente cadastrada. Os Page Objects percorrem a paginação para localizar o produto; o caso de estoque usa o limite real da variação e valida a rejeição de uma quantidade acima dele.
+Os testes Web de login criam uma conta fictícia própria por execução, usando `example.com`, e limpam a sessão antes de cada cenário. Não dependem de uma conta de aluno previamente cadastrada. Os seletores usam IDs, nomes de campos, atributos ARIA, dados de variação e texto/destino de links, sem índices de elementos ou classes visuais. Os Page Objects percorrem a paginação para localizar o produto; o caso de estoque usa o limite real da variação e valida a rejeição de uma quantidade acima dele.
 
 ## Executar performance
 
